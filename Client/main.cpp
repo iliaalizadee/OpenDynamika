@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 {
 
 
-    loadModel(&triangles, "/home/ilia/Documents/untitled.obj");
+    loadModel(&triangles, "/home/ilia/Documents/model.obj");
 
 
     camera.transformCamera(0, 0, 4);
