@@ -1,4 +1,5 @@
 #include <vector>
 #include "object.h"
+#include "surface.h"
 
-Point calculateCoM(Object object);
+Point calculateObjectCoM(Object object);

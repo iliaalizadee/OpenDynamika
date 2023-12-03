@@ -3,11 +3,15 @@
 
 class Object{
     private:
-    std::vector<Triangle> surfaces;
+    std::vector<Surface> surfaces;
     Point CoM;
+    Vec3D speed;
+    Vec3D angularSpeed;
+    float mass;
+    float momentOfInertia;
 
     public:
-    std::vector<Triangle> getSurfaces();
+    std::vector<Surface> getSurfaces();
 
 
 };

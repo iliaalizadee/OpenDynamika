@@ -8,24 +8,24 @@ Point calculateCoM(Object object){
     for (int n = 0; n < object.getSurfaces().size(); n++){
 
         normals.push_back(Position(
-            (object.getSurfaces()[n].vertices[0].pos.x + object.getSurfaces()[n].vertices[1].pos.x + object.getSurfaces()[n].vertices[2].pos.x)/3,
-            (object.getSurfaces()[n].vertices[0].pos.y + object.getSurfaces()[n].vertices[1].pos.y + object.getSurfaces()[n].vertices[2].pos.y)/3,
-            (object.getSurfaces()[n].vertices[0].pos.z + object.getSurfaces()[n].vertices[1].pos.z + object.getSurfaces()[n].vertices[2].pos.z)/3
+            (object.getSurfaces()[n].surfaceBoundary.vertices[0].pos.x + object.getSurfaces()[n].surfaceBoundary.vertices[1].pos.x + object.getSurfaces()[n].surfaceBoundary.vertices[2].pos.x)/3,
+            (object.getSurfaces()[n].surfaceBoundary.vertices[0].pos.y + object.getSurfaces()[n].surfaceBoundary.vertices[1].pos.y + object.getSurfaces()[n].surfaceBoundary.vertices[2].pos.y)/3,
+            (object.getSurfaces()[n].surfaceBoundary.vertices[0].pos.z + object.getSurfaces()[n].surfaceBoundary.vertices[1].pos.z + object.getSurfaces()[n].surfaceBoundary.vertices[2].pos.z)/3
         ));
 
         weights.push_back(
             vecLen(
                 cross(
                     Vec3D(
-                        object.getSurfaces()[n].vertices[1].pos.x - object.getSurfaces()[n].vertices[0].pos.x,
-                        object.getSurfaces()[n].vertices[1].pos.y - object.getSurfaces()[n].vertices[0].pos.y,
-                        object.getSurfaces()[n].vertices[1].pos.z - object.getSurfaces()[n].vertices[0].pos.z
+                        object.getSurfaces()[n].surfaceBoundary.vertices[1].pos.x - object.getSurfaces()[n].surfaceBoundary.vertices[0].pos.x,
+                        object.getSurfaces()[n].surfaceBoundary.vertices[1].pos.y - object.getSurfaces()[n].surfaceBoundary.vertices[0].pos.y,
+                        object.getSurfaces()[n].surfaceBoundary.vertices[1].pos.z - object.getSurfaces()[n].surfaceBoundary.vertices[0].pos.z
 
                     ),
                     Vec3D(
-                        object.getSurfaces()[n].vertices[2].pos.x - object.getSurfaces()[n].vertices[0].pos.x,
-                        object.getSurfaces()[n].vertices[2].pos.y - object.getSurfaces()[n].vertices[0].pos.y,
-                        object.getSurfaces()[n].vertices[2].pos.z - object.getSurfaces()[n].vertices[0].pos.z
+                        object.getSurfaces()[n].surfaceBoundary.vertices[2].pos.x - object.getSurfaces()[n].surfaceBoundary.vertices[0].pos.x,
+                        object.getSurfaces()[n].surfaceBoundary.vertices[2].pos.y - object.getSurfaces()[n].surfaceBoundary.vertices[0].pos.y,
+                        object.getSurfaces()[n].surfaceBoundary.vertices[2].pos.z - object.getSurfaces()[n].surfaceBoundary.vertices[0].pos.z
                     ))));
 
         float xWeightedSum(0);
