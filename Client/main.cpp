@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <QFileDialog>
 #include "camera.h"
 #include "primitives.h"
 #include "functions.h"
@@ -29,20 +30,10 @@ QOpenGLFunctions_4_5_Core *functions;
 
 
 
-const char *fragmentShaderSource = "#version 450 core\n"
-                                   "out vec4 color;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   color = vec4(1.0, 1.0, 1.0, 1.0);\n"
-                                   "}\0";
-
-
-const char *vertexShaderSource = "#version 450 core\n"
-                                 "in vec3 aPos;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                 "}\0";
+const char *fragmentShaderSource;
+const char *vertexShaderSource;
+std::string vertexShaderSourceBuffer;
+std::string fragmentShaderSourceBuffer;
 
 
 
@@ -50,11 +41,38 @@ const char *vertexShaderSource = "#version 450 core\n"
 int main(int argc, char *argv[])
 {
 
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
 
-    loadModel(&triangles, "/home/ilia/Documents/model.obj");
+
+    QFile fragmentShaderSourceFile("/home/ilia/Documents/Simul/Simul/fsh.glsl");
+    QFile vertexShaderSourceFile("/home/ilia/Documents/Simul/Simul/vsh.glsl");
 
 
-    camera.transformCamera(0, 0, 4);
+    if(fragmentShaderSourceFile.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QTextStream stream(&fragmentShaderSourceFile);
+        fragmentShaderSourceBuffer = stream.readAll().toStdString();
+    }
+    fragmentShaderSourceFile.close();
+    fragmentShaderSource = fragmentShaderSourceBuffer.c_str();
+
+
+
+    if(vertexShaderSourceFile.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QTextStream stream(&vertexShaderSourceFile);
+        vertexShaderSourceBuffer = stream.readAll().toStdString();
+    }
+    vertexShaderSourceFile.close();
+    vertexShaderSource = vertexShaderSourceBuffer.c_str();
+
+
+
+    loadModel(&triangles, "/home/ilia/Documents/untitled.obj");
+
+
+
+    camera.transformCamera(1, -1, 4);
     camera.rotateCamera(rad(15), rad(15), 0);
 
     camera.setAspectRatio(1);
@@ -62,15 +80,10 @@ int main(int argc, char *argv[])
     camera.setNearPlane(1);
     camera.setFarPlane(20);
 
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+
 
     functions =  QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
 
-
-
-    transformAndNormalize(&triangles, camera);
 
     unsigned int program = functions->glCreateProgram();
 
@@ -106,14 +119,27 @@ int main(int argc, char *argv[])
 
     functions->glBufferData(GL_ARRAY_BUFFER, sizeof(array), array, GL_STATIC_DRAW);
 
-    int posattr = functions->glGetAttribLocation(program, "aPos");
-    functions->glVertexAttribPointer(posattr, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
-    functions->glEnableVertexAttribArray(posattr);
+    int wxyUniformLocation = functions->glGetUniformLocation(program, "wxy");
+    int wzUniformLocation = functions->glGetUniformLocation(program, "wz");
+    int cameraPositionUniformLocation = functions->glGetUniformLocation(program, "cameraPosition");
+    int cameraUpVectorUniformLocation = functions->glGetUniformLocation(program, "cameraUpVector");
+    int cameraRightVectorUniformLocation = functions->glGetUniformLocation(program, "cameraRightVector");
+    int positionAttributeLocation = functions->glGetAttribLocation(program, "position");
+
+    functions->glUniform1f(wxyUniformLocation, camera.getPlaneWidth()/2);
+    functions->glUniform1f(wzUniformLocation, (camera.getFarPlane() - camera.getNearPlane())/2);
+    functions->glUniform3f(cameraPositionUniformLocation, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+    functions->glUniform3f(cameraUpVectorUniformLocation, camera.getCameraUpVector().i, camera.getCameraUpVector().j, camera.getCameraUpVector().k);
+    functions->glUniform3f(cameraRightVectorUniformLocation, camera.getCameraRightVector().i, camera.getCameraRightVector().j, camera.getCameraRightVector().k);
+
+    functions->glVertexAttribPointer(positionAttributeLocation, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
+    functions->glEnableVertexAttribArray(positionAttributeLocation);
 
     functions->glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
     functions->glDrawArrays(GL_TRIANGLES, 0, (int)sizeof(array)/sizeof(GL_FLOAT));
+
     return a.exec();
 }
 
